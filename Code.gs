@@ -44,18 +44,18 @@ const TABS = {
 const SECURITI = {
   url: 'https://app.securiti.ai/privaci/v1/consentapi/consent_upload',
   purposeMap: {
-    'privacy_notice.service_processing': 'REPLACE_WITH_PURPOSE_ID',
-    'marketing.calls':                   'REPLACE_WITH_PURPOSE_ID',
-    'marketing.whatsapp':                'REPLACE_WITH_PURPOSE_ID',
-    'marketing.sms':                     'REPLACE_WITH_PURPOSE_ID',
-    'marketing.email':                   'REPLACE_WITH_PURPOSE_ID',
-    'cross_service.data_linking':        'REPLACE_WITH_PURPOSE_ID',
-    'interest.shopping_lifestyle':       'REPLACE_WITH_PURPOSE_ID',
-    'interest.entertainment':            'REPLACE_WITH_PURPOSE_ID',
-    'interest.sports_experiences':       'REPLACE_WITH_PURPOSE_ID',
-    'interest.financial_services':       'REPLACE_WITH_PURPOSE_ID',
-    'interest.health_wellness':          'REPLACE_WITH_PURPOSE_ID',
-    'interest.education':                'REPLACE_WITH_PURPOSE_ID'
+    'privacy_notice.service_processing': '23',
+    'marketing.calls':                   '24',
+    'marketing.whatsapp':                '25',
+    'marketing.sms':                     '26',
+    'marketing.email':                   '27',
+    'cross_service.data_linking':        '28',
+    'interest.shopping_lifestyle':       '29',
+    'interest.entertainment':            '30',
+    'interest.sports_experiences':       '31',
+    'interest.financial_services':       '32',
+    'interest.health_wellness':          '33',
+    'interest.education':                '34'
   },
   // Status values your Securiti tenant expects
   statusMap: { granted: 'GRANTED', declined: 'DECLINED', withdrawn: 'WITHDRAWN' }
