@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Get a new SIM – Nimbus Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF; --surface:#F2F3FA; --nav:#E6E8F7; --card:#FFFFFF;
+    --ink:#161A33; --muted:#5B6180; --line:#D9DCEB;
+    --brand:#2338C9; --brand-ink:#FFFFFF; --brand-soft:#E3E7FF;
+    --ok:#14996F; --danger:#C2362B;
+    color-scheme:light;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1222; --surface:#181C33; --nav:#1B2040; --card:#141830;
+      --ink:#ECEEF8; --muted:#A3A8C3; --line:#2C3256;
+      --brand:#7586FF; --brand-ink:#0F1222; --brand-soft:#232B5C;
+      --ok:#3DD39F; --danger:#FF7A6E;
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1222; --surface:#181C33; --nav:#1B2040; --card:#141830;
+    --ink:#ECEEF8; --muted:#A3A8C3; --line:#2C3256;
+    --brand:#7586FF; --brand-ink:#0F1222; --brand-soft:#232B5C;
+    --ok:#3DD39F; --danger:#FF7A6E;
+    color-scheme:dark;
+  }
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-padding-top:env(safe-area-inset-top,0px)}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Figtree,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  img,svg{max-width:100%}
+  [hidden]{display:none !important}
+
+  /* Navigation */
+  .navbar{background:var(--nav);display:flex;align-items:center;gap:8px;padding:0 clamp(16px,4vw,40px)}
+  .brand{display:flex;align-items:center;gap:10px;padding:12px 16px 12px 0;margin-right:8px;color:var(--ink);text-decoration:none;
+    font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;font-weight:800;font-size:1.2rem;white-space:nowrap}
+  .navlinks{display:flex;list-style:none;margin:0;padding:0;overflow-x:auto;scrollbar-width:none}
+  .navlinks::-webkit-scrollbar{display:none}
+  .navlinks a{display:block;padding:18px 14px 15px;color:var(--ink);text-decoration:none;font-weight:500;white-space:nowrap;border-bottom:3px solid transparent}
+  .navlinks a:hover{color:var(--brand)}
+  .navlinks a[aria-current="page"]{border-color:var(--brand);font-weight:700}
+
+  /* Layout */
+  main{max-width:1200px;margin:0 auto;padding:32px clamp(16px,4vw,40px) 56px;display:grid;
+    grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(24px,5vw,72px);align-items:start}
+  @media (max-width:900px){main{grid-template-columns:1fr}}
+  .screen{display:none}
+  .screen.active{display:block;animation:rise .28s ease-out}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.screen.active{animation:none}}
+
+  h1,h2{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;line-height:1.15;margin:0 0 16px}
+  h1{font-size:clamp(1.6rem,3vw,2rem);font-weight:800}
+  h2{font-size:clamp(1.35rem,2.4vw,1.65rem);font-weight:800}
+  h3{font-size:1.05rem;margin:22px 0 8px}
+  h1:focus,h2:focus{outline:none}
+  p{margin:0 0 12px}
+
+  /* Accordion steps */
+  .step{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:14px;overflow:hidden}
+  .step.open{border-top:3px solid var(--brand)}
+  .step-head{display:flex;align-items:center;gap:12px;padding:16px 20px;width:100%;background:none;border:0;color:inherit;font:inherit;font-weight:600;text-align:left}
+  .step-num{width:28px;height:28px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:.85rem;border:1.5px solid var(--muted);color:var(--muted)}
+  .step.open .step-num{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+  .step.done .step-num{background:var(--ok);border-color:var(--ok);color:#fff}
+  .step.locked .step-head{color:var(--muted)}
+  .step-summary{margin-left:auto;color:var(--muted);font-weight:500;font-size:.9rem;text-align:right}
+  .step-body{padding:0 20px 20px}
+  .step:not(.open) .step-body{display:none}
+
+  .well{background:var(--surface);border-radius:12px;padding:16px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:.9rem;color:var(--muted);margin-bottom:6px;font-weight:500}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media (max-width:520px){.row2{grid-template-columns:1fr}}
+  input.text{width:100%;font:inherit;font-size:1.05rem;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+  input.text[readonly]{background:transparent;color:var(--muted)}
+  input.text.code{letter-spacing:.35em;font-weight:700;font-size:1.25rem}
+  .field.invalid input.text{border-color:var(--danger)}
+  input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+  .input-wrap{position:relative}
+  .input-wrap input.text{padding-right:48px}
+  .clear-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:0;background:var(--ink);color:var(--card);cursor:pointer;display:grid;place-items:center}
+  .hint{font-size:.85rem;color:var(--muted);margin-top:6px}
+  .err{color:var(--danger);font-size:.85rem;margin-top:6px}
+  .err:empty{display:none}
+  .otp-note{margin:4px 0 12px;font-size:.95rem}
+
+  .actions{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap}
+  .btn{font:inherit;font-weight:700;border-radius:999px;padding:12px 26px;border:1.5px solid transparent;cursor:pointer}
+  .btn-primary{background:var(--brand);color:var(--brand-ink)}
+  .btn-primary:hover:not(:disabled){filter:brightness(1.08)}
+  .btn-primary:disabled{opacity:.45;cursor:not-allowed}
+  .btn-ghost{background:var(--surface);color:var(--brand);border-color:var(--line)}
+  .btn-ghost:hover{border-color:var(--brand)}
+  .stack{display:grid;gap:12px;max-width:440px;margin:24px auto 0}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:560px;margin:24px auto 12px}
+  @media (max-width:520px){.pair{grid-template-columns:1fr}}
+  .link-btn{background:none;border:0;color:var(--brand);font:inherit;font-weight:600;padding:0;cursor:pointer;text-decoration:underline}
+
+  /* Consent screens */
+  .consent{max-width:640px;margin:0 auto}
+  .center{text-align:center}
+  .notice ul{margin:0 0 12px;padding-left:22px}
+  .notice li{margin-bottom:4px}
+  .checks{list-style:none;padding:0;margin:20px auto;display:grid;gap:14px;max-width:440px;text-align:left}
+  .checks.grid2{grid-template-columns:1fr 1fr;max-width:600px;column-gap:28px}
+  @media (max-width:520px){.checks.grid2{grid-template-columns:1fr}}
+  .check{display:flex;align-items:center;gap:12px;cursor:pointer;font-size:1.05rem;position:relative}
+  .check input{position:absolute;opacity:0;width:1px;height:1px}
+  .box{width:26px;height:26px;border-radius:50%;border:2px solid var(--muted);display:grid;place-items:center;flex:none;color:#fff;transition:background .15s,border-color .15s}
+  .box svg{opacity:0;transition:opacity .15s}
+  .check input:checked + .box{background:var(--ok);border-color:var(--ok)}
+  .check input:checked + .box svg{opacity:1}
+  .check input:focus-visible + .box{outline:3px solid var(--brand);outline-offset:2px}
+  .radio-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;margin:20px 0 4px;font-weight:700}
+  .radio-row .check{font-weight:600}
+  .radio-row .box{border-width:2.5px}
+  .radio-row input:checked + .box{background:var(--card);border-color:var(--ink);box-shadow:inset 0 0 0 4px var(--card),inset 0 0 0 13px var(--ink)}
+  .radio-row input:checked + .box svg{opacity:0}
+  .fine{font-size:.85rem;color:var(--muted);text-align:left;max-width:600px;margin:0 auto}
+  .fine a{color:var(--brand);font-weight:600}
+  .footnote{font-style:italic;font-size:.9rem;color:var(--muted);text-align:center;margin-top:28px}
+  .footnote a{color:var(--brand)}
+
+  .art{display:block;margin:0 auto 16px}
+  .logos{display:grid;grid-template-columns:repeat(6,56px);justify-content:center;gap:0 6px;margin:0 auto 20px}
+  .logos span{grid-column:span 2;width:112px;height:112px}
+  .logos span:nth-child(4){grid-column:2 / span 2;margin-top:-14px}
+  .logos span:nth-child(5){grid-column:4 / span 2;margin-top:-14px}
+  .logos svg{width:100%;height:100%;filter:drop-shadow(0 6px 10px rgba(20,24,60,.18))}
+  @media (max-width:420px){.logos{grid-template-columns:repeat(6,44px)}.logos span{width:88px;height:88px}}
+
+  .tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:24px}
+  @media (max-width:640px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .tile{border-radius:14px;padding:14px;color:#fff;min-height:170px;display:flex;flex-direction:column;justify-content:space-between;text-align:left}
+  .tile b{display:flex;align-items:center;gap:6px;font-size:.95rem}
+  .tile small{display:block;font-size:.78rem;opacity:.9;line-height:1.35;margin-top:6px}
+  .tile svg{align-self:flex-end;opacity:.9}
+  .t1{background:linear-gradient(160deg,#B7791F,#6B3E0A)}
+  .t2{background:linear-gradient(160deg,#1D9A85,#0B5247)}
+  .t3{background:linear-gradient(160deg,#2F4F8F,#101C3D)}
+  .t4{background:linear-gradient(160deg,#B4233A,#5E0D1B)}
+
+  /* Result */
+  .receipt{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
+  .status-icon{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--ok);color:#fff;margin-bottom:16px}
+  .status-icon.fail{background:var(--danger)}
+  .ref{display:inline-block;background:var(--surface);border-radius:10px;padding:8px 14px;font-weight:700;font-size:1.1rem;letter-spacing:.04em;margin:4px 0 16px}
+  .summary{width:100%;border-collapse:collapse;margin-top:8px;font-size:.95rem}
+  .summary th,.summary td{text-align:left;padding:8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+  .summary th{font-weight:600;padding-right:12px}
+  .pill{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.8rem;font-weight:700;margin:2px 4px 2px 0}
+  .pill.granted{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+  .pill.declined{background:color-mix(in srgb,var(--danger) 15%,transparent);color:var(--danger)}
+  .demo-note{margin-top:18px;font-size:.9rem;color:var(--muted)}
+  details{margin-top:12px}
+  details pre{background:var(--surface);border-radius:10px;padding:14px;overflow-x:auto;font-size:.8rem;max-height:340px}
+  .spinner{width:36px;height:36px;border-radius:50%;border:4px solid var(--brand-soft);border-top-color:var(--brand);animation:spin 1s linear infinite;margin-bottom:16px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Promo */
+  aside{position:sticky;top:24px}
+  @media (max-width:900px){aside{position:static}}
+  .promo{border-radius:22px;padding:28px 26px;color:#fff;overflow:hidden;position:relative;
+    background:radial-gradient(120% 60% at 50% 115%,rgba(120,170,255,.55),transparent 60%),linear-gradient(165deg,#1B3BE0,#0A1878 75%)}
+  .promo h2{color:#fff;text-align:center;font-size:clamp(1.4rem,2.6vw,1.9rem);margin-bottom:18px}
+  .price-box{border:1.5px solid rgba(255,255,255,.55);border-radius:18px;padding:16px 12px 14px;text-align:center;max-width:300px;margin:0 auto 22px}
+  .price{font-family:"Bricolage Grotesque",Figtree,sans-serif;font-weight:800;font-size:clamp(3.2rem,7vw,4.6rem);line-height:1;color:#FFD43B;letter-spacing:-.02em}
+  .price small{font-size:.55em;vertical-align:.32em;margin-right:2px}
+  .price-box p{margin:6px 0 0;font-weight:600}
+  .perks{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;list-style:none;padding:0;margin:0;text-align:center;font-size:.78rem;font-weight:600;line-height:1.3}
+  .perks span{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.95);color:#1B3BE0;margin:0 auto 6px}
+  .promo .wave{display:block;margin:22px -26px -28px;width:calc(100% + 52px)}
+  .side-note{margin-top:16px;background:var(--surface);border-radius:16px;padding:18px 20px;font-size:.92rem;color:var(--muted)}
+  .side-note b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<nav class="navbar" aria-label="Main">
+  <a class="brand" href="#" aria-label="Nimbus Mobile home">
+    <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="10" fill="#2338C9"/><path d="M9 23.5a5 5 0 0 1 1.2-9.86A7 7 0 0 1 23.6 12a4.8 4.8 0 0 1 1.4 9.4c-.5.1-1 .1-1.5.1H10.5" fill="none" stroke="#FFD43B" stroke-width="2.6" stroke-linecap="round"/></svg>
+    Nimbus Mobile
+  </a>
+  <ul class="navlinks">
+    <li><a href="#">Discover</a></li>
+    <li><a href="#">Prepaid</a></li>
+    <li><a href="#">Postpaid</a></li>
+    <li><a href="#">5G</a></li>
+    <li><a href="#">International</a></li>
+    <li><a href="#">Devices</a></li>
+    <li><a href="#">Apps</a></li>
+    <li><a href="#">Recharge</a></li>
+    <li><a href="#" aria-current="page">Get a SIM</a></li>
+    <li><a href="#">Pay bills</a></li>
+  </ul>
+</nav>
+
+<main>
+  <section aria-live="polite">
+
+    <!-- Screen 1: verification + details -->
+    <div class="screen active" id="screen-apply">
+      <div class="step open" id="step1">
+        <div class="step-head"><span class="step-num">1</span><span>Verification</span><span class="step-summary" id="step1Summary"></span></div>
+        <div class="step-body">
+          <h1>Let's verify it's you</h1>
+          <div class="well">
+            <div class="field">
+              <label for="mobile">Mobile number</label>
+              <div class="input-wrap">
+                <input class="text" id="mobile" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="10-digit mobile number">
+                <button class="clear-btn" id="clearMobile" type="button" aria-label="Clear mobile number">
+                  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+                </button>
+              </div>
+              <div class="err"></div>
+            </div>
+            <div class="field">
+              <label for="pincode">Delivery pincode</label>
+              <input class="text" id="pincode" type="text" inputmode="numeric" autocomplete="postal-code" maxlength="6" placeholder="6-digit pincode">
+              <div class="err"></div>
+            </div>
+
+            <div id="otpBlock" hidden>
+              <p class="otp-note">Enter the 6-digit code sent to <b id="otpTarget"></b>. <button type="button" class="link-btn" id="changeNumber">Change number</button></p>
+              <div class="field">
+                <label for="otp">Verification code</label>
+                <input class="text code" id="otp" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••">
+                <div class="hint">This is a demo, so any 6 digits will work.</div>
+                <div class="err"></div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn btn-primary" id="verifyBtn" type="button">Verify</button>
+              <button class="btn btn-primary" id="otpBtn" type="button" hidden>Confirm code</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step locked" id="step2">
+        <div class="step-head"><span class="step-num">2</span><span>Your details</span></div>
+        <div class="step-body">
+          <h2>Tell us about you</h2>
+          <div class="well">
+            <div class="field">
+              <label for="email">Email address</label>
+              <input class="text" id="email" type="email" autocomplete="email" placeholder="name@example.com">
+              <div class="err"></div>
+            </div>
+            <div class="row2">
+              <div class="field">
+                <label for="firstName">First name</label>
+                <input class="text" id="firstName" type="text" autocomplete="given-name" maxlength="50">
+                <div class="err"></div>
+              </div>
+              <div class="field">
+                <label for="lastName">Last name</label>
+                <input class="text" id="lastName" type="text" autocomplete="family-name" maxlength="50">
+                <div class="err"></div>
+              </div>
+            </div>
+            <div class="field">
+              <label for="aadhaar">Aadhaar number</label>
+              <input class="text" id="aadhaar" type="text" inputmode="numeric" autocomplete="off" maxlength="14" placeholder="XXXX XXXX XXXX">
+              <div class="hint">Use any 12 digits for this demo. Only the last 4 digits are stored in readable form.</div>
+              <div class="err"></div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary" id="detailsBtn" type="button">Next</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step locked">
+        <div class="step-head"><span class="step-num">3</span><span>Privacy and preferences</span></div>
+      </div>
+    </div>
+
+    <!-- Screen 2: privacy notice -->
+    <div class="screen" id="screen-notice">
+      <div class="consent notice">
+        <h2>What information we collect and why</h2>
+        <ul>
+          <li>To verify your identity and activate your service, we collect your identification details, contact information and location data. This helps us confirm your eligibility and provide the services you asked for.</li>
+        </ul>
+        <h3>Once your services are active, we process your information to:</h3>
+        <ul>
+          <li>Manage and deliver your services</li>
+          <li>Process transactions, billing and payments</li>
+          <li>Provide customer support and improve our services</li>
+          <li>Send important service and account updates</li>
+          <li>Meet legal, regulatory and public safety obligations</li>
+        </ul>
+        <p>For these purposes, we may use your account information, subscription details, usage data, billing and payment information, communications and customer support records.</p>
+
+        <div class="radio-row" role="radiogroup" aria-labelledby="ageLabel">
+          <span id="ageLabel">I confirm that I am 18 years or older</span>
+          <label class="check"><input type="radio" name="age" value="yes"><span class="box"><svg width="0" height="0"></svg></span>Yes</label>
+          <label class="check"><input type="radio" name="age" value="no"><span class="box"><svg width="0" height="0"></svg></span>No</label>
+        </div>
+        <div class="err" id="ageErr"></div>
+
+        <div class="stack">
+          <button class="btn btn-primary" id="noticeBtn" type="button" disabled>I understand and continue</button>
+        </div>
+        <p class="footnote">For more on how we collect, use, share, retain and protect your personal information, see our <a href="#">Privacy Notice</a>.</p>
+      </div>
+    </div>
+
+    <!-- Screen 3: marketing channels -->
+    <div class="screen" id="screen-marketing">
+      <div class="consent center">
+        <svg class="art" width="170" height="150" viewBox="0 0 170 150" aria-hidden="true">
+          <path d="M40 62 L112 26 L112 118 L40 88 Z" fill="#E9EBF5" stroke="#C9CDE2" stroke-width="2"/>
+          <ellipse cx="114" cy="72" rx="20" ry="47" fill="#E5323B"/>
+          <ellipse cx="114" cy="72" rx="12" ry="34" fill="#F4F5FB"/>
+          <ellipse cx="118" cy="72" rx="5" ry="9" fill="#E5323B"/>
+          <rect x="24" y="60" width="20" height="30" rx="6" fill="#E5323B"/>
+          <path d="M44 86 L54 88 L58 130 a6 6 0 0 1-6 6 h-4 a5 5 0 0 1-5-5 Z" fill="#2B2F45"/>
+          <path d="M140 52 l14-8 M144 72 h16 M140 92 l14 8" stroke="#2338C9" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <h2>Stay updated on what matters to you</h2>
+        <p>Would you like to receive personalised offers, updates and recommendations from Nimbus Mobile?</p>
+        <ul class="checks" id="channelList">
+          <li><label class="check"><input type="checkbox" value="calls" checked><span class="box"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Calls</label></li>
+          <li><label class="check"><input type="checkbox" value="whatsapp" checked><span class="box"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>WhatsApp</label></li>
+          <li><label class="check"><input type="checkbox" value="sms" checked><span class="box"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>SMS</label></li>
+          <li><label class="check"><input type="checkbox" value="email" checked><span class="box"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Email</label></li>
+        </ul>
+        <p class="fine">We use your phone number, email address and other account identifiers to send you personalised offers, updates and recommendations. Manage your preferences and exercise your privacy rights <a href="#">here</a>.</p>
+        <div class="stack">
+          <button class="btn btn-primary" id="mktYes" type="button">I understand and continue</button>
+          <button class="btn btn-ghost" id="mktNo" type="button">Not now</button>
+        </div>
+        <p class="footnote">For more on how we collect, use, share, retain and protect your personal information, see our <a href="#">Privacy Notice</a>.</p>
+      </div>
+    </div>
+
+    <!-- Screen 4: connect experiences -->
+    <div class="screen" id="screen-connect">
+      <div class="consent center">
+        <div class="logos" aria-hidden="true">
+          <span><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#2B2F45"/><circle cx="50" cy="50" r="40" fill="#F2A93B"/><circle cx="50" cy="50" r="14" fill="#fff"/><g stroke="#fff" stroke-width="5" stroke-linecap="round"><path d="M50 22v8M50 70v8M22 50h8M70 50h8M30 30l6 6M64 64l6 6M30 70l6-6M64 36l6-6"/></g></svg></span>
+          <span><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#2B2F45"/><circle cx="50" cy="50" r="40" fill="#6B3FD4"/><path d="M42 34 L68 50 L42 66 Z" fill="#fff"/></svg></span>
+          <span><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#2B2F45"/><circle cx="50" cy="50" r="40" fill="#2FB58A"/><path d="M44 66 V36 l22-6 v28" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round"/><circle cx="39" cy="66" r="7" fill="#fff"/><circle cx="61" cy="58" r="7" fill="#fff"/></svg></span>
+          <span><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#2B2F45"/><circle cx="50" cy="50" r="40" fill="#1E2A4A"/><path d="M34 36h32M50 36v32" stroke="#fff" stroke-width="7" stroke-linecap="round"/></svg></span>
+          <span><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#2B2F45"/><circle cx="50" cy="50" r="40" fill="#D8343B"/><path d="M34 42h32l-3 26H37Z" fill="#fff"/><path d="M42 42v-4a8 8 0 0 1 16 0v4" fill="none" stroke="#fff" stroke-width="4"/></svg></span>
+        </div>
+        <h2>Connect your Nimbus experiences</h2>
+        <div style="text-align:left">
+          <p><b>You use more than one Nimbus Group service.</b></p>
+          <p>With your consent, we can use selected information across these services to improve your experience and make our services more relevant to you.</p>
+          <ul class="checks" style="margin-left:0">
+            <li class="check"><span class="box" style="background:var(--ok);border-color:var(--ok)"><svg width="14" height="14" viewBox="0 0 14 14" style="opacity:1"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Personalised recommendations</li>
+            <li class="check"><span class="box" style="background:var(--ok);border-color:var(--ok)"><svg width="14" height="14" viewBox="0 0 14 14" style="opacity:1"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Relevant offers across services</li>
+            <li class="check"><span class="box" style="background:var(--ok);border-color:var(--ok)"><svg width="14" height="14" viewBox="0 0 14 14" style="opacity:1"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>A more seamless experience</li>
+          </ul>
+        </div>
+        <p class="fine">We use your phone number, email address and other account identifiers to send you personalised offers, updates and recommendations. Manage your preferences and exercise your privacy rights <a href="#">here</a>.</p>
+        <div class="pair">
+          <button class="btn btn-primary" id="connYes" type="button">Yes, connect my experiences</button>
+          <button class="btn btn-ghost" id="connChoose" type="button">Choose what to connect</button>
+        </div>
+        <div class="stack" style="margin-top:0">
+          <button class="btn btn-ghost" id="connNo" type="button">Not now</button>
+        </div>
+        <p class="footnote">For more on how we collect, use, share, retain and protect your personal information, see our <a href="#">Privacy Notice</a>.</p>
+      </div>
+    </div>
+
+    <!-- Screen 5: choose interests -->
+    <div class="screen" id="screen-interests">
+      <div class="consent center">
+        <div class="tiles" aria-hidden="true">
+          <div class="tile t1"><div><b>Nimbus Pay</b><small>Payments, savings, loans and insurance in one place.</small></div><svg width="40" height="40" viewBox="0 0 40 40"><circle cx="16" cy="22" r="11" fill="none" stroke="#fff" stroke-width="3"/><circle cx="26" cy="16" r="11" fill="none" stroke="#fff" stroke-width="3"/></svg></div>
+          <div class="tile t2"><div><b>Nimbus Care</b><small>Book appointments and keep your health reports together.</small></div><svg width="40" height="40" viewBox="0 0 40 40"><path d="M20 34S6 25 6 15a7 7 0 0 1 14-2 7 7 0 0 1 14 2c0 10-14 19-14 19Z" fill="none" stroke="#fff" stroke-width="3"/></svg></div>
+          <div class="tile t3"><div><b>Nimbus Tunes</b><small>Millions of songs across 16 languages.</small></div><svg width="40" height="40" viewBox="0 0 40 40"><path d="M15 30V10l17-4v20" fill="none" stroke="#fff" stroke-width="3"/><circle cx="11" cy="30" r="5" fill="#fff"/><circle cx="28" cy="26" r="5" fill="#fff"/></svg></div>
+          <div class="tile t4"><div><b>Nimbus TV</b><small>Live channels and shows in one app.</small></div><svg width="40" height="40" viewBox="0 0 40 40"><rect x="5" y="9" width="30" height="20" rx="4" fill="none" stroke="#fff" stroke-width="3"/><path d="M14 34h12" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg></div>
+        </div>
+        <h2>Discover more from Nimbus Group</h2>
+        <p>We can occasionally show you relevant offers and introduce you to products and services from participating Nimbus Group businesses.</p>
+        <h3>What would you like to hear about?</h3>
+        <ul class="checks grid2" id="interestList">
+          <li><label class="check"><input type="checkbox" value="shopping_lifestyle"><span class="box"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Shopping and lifestyle</label></li>
+          <li><label class="check"><input type="checkbox" value="financial_services"><span class="box"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Financial services</label></li>
+          <li><label class="check"><input type="checkbox" value="entertainment"><span class="box"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Entertainment</label></li>
+          <li><label class="check"><input type="checkbox" value="health_wellness"><span class="box"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Health and wellness</label></li>
+          <li><label class="check"><input type="checkbox" value="sports_experiences"><span class="box"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Sports and experiences</label></li>
+          <li><label class="check"><input type="checkbox" value="education"><span class="box"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Education</label></li>
+        </ul>
+        <p class="fine">We use your phone number, email address and other account identifiers to send you personalised offers, updates and recommendations. Manage your preferences and exercise your privacy rights <a href="#">here</a>.</p>
+        <div class="stack">
+          <button class="btn btn-primary" id="saveInterests" type="button">Save preferences</button>
+        </div>
+        <p class="footnote">For more on how we collect, use, share, retain and protect your personal information, see our <a href="#">Privacy Notice</a>.</p>
+      </div>
+    </div>
+
+    <!-- Screen 6: result -->
+    <div class="screen" id="screen-done">
+      <div class="receipt" id="result"></div>
+    </div>
+
+  </section>
+
+  <aside aria-label="Featured plan">
+    <div class="promo">
+      <h2>Unlimited 5G, every day</h2>
+      <div class="price-box">
+        <div class="price"><small>₹</small>349</div>
+        <p>2 GB/day for 28 days</p>
+      </div>
+      <ul class="perks">
+        <li><span><svg width="20" height="20" viewBox="0 0 20 20"><path d="M6 3v14M6 3 2.5 6.5M6 3l3.5 3.5M14 17V3M14 17l-3.5-3.5M14 17l3.5-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Unlimited 5G data</li>
+        <li><span><svg width="20" height="20" viewBox="0 0 20 20"><path d="M7 5l9 5-9 5Z" fill="currentColor"/></svg></span>Streaming pass</li>
+        <li><span><svg width="20" height="20" viewBox="0 0 20 20"><path d="M5.5 15.5a3.5 3.5 0 0 1 .4-7A5 5 0 0 1 15 8a3.7 3.7 0 0 1 0 7.5Z" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>1 TB cloud storage</li>
+        <li><span><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2l2.2 5.3L18 8l-4.4 3.8L15 18l-5-3.1L5 18l1.4-6.2L2 8l5.8-.7Z" fill="currentColor"/></svg></span>Weekly rewards</li>
+      </ul>
+      <svg class="wave" viewBox="0 0 400 90" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#7FB2FF" stop-opacity="0"/><stop offset=".5" stop-color="#CFE0FF"/><stop offset="1" stop-color="#7FB2FF" stop-opacity="0"/></linearGradient></defs>
+        <path d="M0 60 C120 20 280 20 400 60" stroke="url(#g)" stroke-width="2" fill="none"/>
+        <path d="M0 72 C120 36 280 36 400 72" stroke="url(#g)" stroke-width="1.5" fill="none" opacity=".7"/>
+        <path d="M0 84 C120 52 280 52 400 84" stroke="url(#g)" stroke-width="1" fill="none" opacity=".5"/>
+      </svg>
+    </div>
+    <div class="side-note"><b>Free SIM delivery.</b> Your SIM arrives at your pincode in 2 to 4 days. Keep your Aadhaar handy for activation.</div>
+  </aside>
+</main>
+
+<script>
+/* ===================== CONFIG =====================
+   Set SHEETS_URL to your Google Apps Script web app URL, e.g.
+   "https://script.google.com/macros/s/AKfycb.../exec"
+   Leave it empty to run in demo mode (records are kept in this browser only). */
+const CONFIG = {
+  SHEETS_URL: "https://script.google.com/macros/s/AKfycbzAqmHX_ha2kd08SzRKkwFkBzmrnl5_UVe7P5kjGWQxdsvIWna7fab0Vmxs9yR_VJZr/exec",
+  NOTICE_VERSION: "2026-10-v1"
+};
+/* ================================================== */
+
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const now = () => new Date().toISOString();
+
+const LABELS = {
+  privacy_notice: "Privacy notice",
+  marketing: "Offers and updates",
+  cross_service: "Connect services",
+  interest: "Interests",
+  service_processing: "Service processing",
+  calls: "Calls", whatsapp: "WhatsApp", sms: "SMS", email: "Email",
+  data_linking: "Use information across services",
+  shopping_lifestyle: "Shopping and lifestyle", entertainment: "Entertainment",
+  sports_experiences: "Sports and experiences", financial_services: "Financial services",
+  health_wellness: "Health and wellness", education: "Education"
+};
+const INTERESTS = ["shopping_lifestyle","entertainment","sports_experiences","financial_services","health_wellness","education"];
+
+let J, lastPayload;
+
+function resetJourney() {
+  J = { startedAt: now(), applicant: {}, consents: [], events: [], outcome: null };
+}
+function log(step, action) { J.events.push({ step, action, at: now() }); }
+function setConsent(purpose, item, status) {
+  const rec = { purpose, item, status, capturedAt: now() };
+  const i = J.consents.findIndex(c => c.purpose === purpose && c.item === item);
+  if (i >= 0) J.consents[i] = rec; else J.consents.push(rec);
+}
+function show(id) {
+  $$(".screen").forEach(s => s.classList.toggle("active", s.id === id));
+  window.scrollTo({ top: 0 });
+  const h = $(`#${id} h1, #${id} h2`);
+  if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
+  log(id.replace("screen-", ""), "viewed");
+}
+function fieldError(input, msg) {
+  const f = input.closest(".field");
+  f.classList.toggle("invalid", !!msg);
+  f.querySelector(".err").textContent = msg || "";
+  input.setAttribute("aria-invalid", msg ? "true" : "false");
+  return !msg;
+}
+function digitsOnly(input, max) {
+  input.addEventListener("input", () => {
+    input.value = input.value.replace(/\D/g, "").slice(0, max);
+    fieldError(input, "");
+  });
+}
+const maskMobile = m => `+91 XXXXXX${m.slice(-4)}`;
+const maskAadhaar = a => `XXXX XXXX ${a.replace(/\D/g, "").slice(-4)}`;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+/* ---------- Step 1: verification ---------- */
+const mobile = $("#mobile"), pincode = $("#pincode"), otp = $("#otp");
+digitsOnly(mobile, 10); digitsOnly(pincode, 6); digitsOnly(otp, 6);
+
+$("#clearMobile").addEventListener("click", () => { if (!mobile.readOnly) { mobile.value = ""; mobile.focus(); } });
+
+$("#verifyBtn").addEventListener("click", () => {
+  const okM = fieldError(mobile, /^[6-9]\d{9}$/.test(mobile.value) ? "" : "Enter a 10-digit mobile number starting with 6, 7, 8 or 9.");
+  const okP = fieldError(pincode, /^[1-9]\d{5}$/.test(pincode.value) ? "" : "Enter a 6-digit pincode that doesn't start with 0.");
+  if (!okM || !okP) return;
+  J.applicant.mobile = mobile.value;
+  J.applicant.pincode = pincode.value;
+  log("verification", "code_requested");
+  mobile.readOnly = pincode.readOnly = true;
+  $("#clearMobile").hidden = true;
+  $("#otpTarget").textContent = maskMobile(mobile.value);
+  $("#otpBlock").hidden = false;
+  $("#verifyBtn").hidden = true;
+  $("#otpBtn").hidden = false;
+  otp.focus();
+});
+
+$("#changeNumber").addEventListener("click", () => {
+  mobile.readOnly = pincode.readOnly = false;
+  $("#clearMobile").hidden = false;
+  $("#otpBlock").hidden = true;
+  otp.value = ""; fieldError(otp, "");
+  $("#verifyBtn").hidden = false;
+  $("#otpBtn").hidden = true;
+  log("verification", "number_changed");
+  mobile.focus();
+});
+
+$("#otpBtn").addEventListener("click", () => {
+  if (!fieldError(otp, /^\d{6}$/.test(otp.value) ? "" : "Enter the 6-digit code.")) return;
+  J.applicant.otpVerified = true;
+  log("verification", "code_verified");
+  $("#step1").classList.remove("open"); $("#step1").classList.add("done");
+  $("#step1Summary").textContent = `Verified ${maskMobile(J.applicant.mobile)}`;
+  $("#step1 .step-num").innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" aria-label="Done"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  $("#step2").classList.remove("locked"); $("#step2").classList.add("open");
+  log("details", "viewed");
+  $("#email").focus();
+});
+
+/* ---------- Step 2: details ---------- */
+const email = $("#email"), firstName = $("#firstName"), lastName = $("#lastName"), aadhaar = $("#aadhaar");
+[email, firstName, lastName].forEach(i => i.addEventListener("input", () => fieldError(i, "")));
+aadhaar.addEventListener("input", () => {
+  const d = aadhaar.value.replace(/\D/g, "").slice(0, 12);
+  aadhaar.value = d.replace(/(\d{4})(?=\d)/g, "$1 ");
+  fieldError(aadhaar, "");
+});
+
+$("#detailsBtn").addEventListener("click", () => {
+  const nameRe = /^[A-Za-z][A-Za-z .'-]{0,49}$/;
+  const ok = [
+    fieldError(email, /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim()) ? "" : "Enter an email address like name@example.com."),
+    fieldError(firstName, nameRe.test(firstName.value.trim()) ? "" : "Enter your first name using letters only."),
+    fieldError(lastName, nameRe.test(lastName.value.trim()) ? "" : "Enter your last name using letters only."),
+    fieldError(aadhaar, /^\d{12}$/.test(aadhaar.value.replace(/\s/g, "")) ? "" : "Enter all 12 digits of the Aadhaar number.")
+  ].every(Boolean);
+  if (!ok) return;
+  Object.assign(J.applicant, {
+    email: email.value.trim(),
+    firstName: firstName.value.trim(),
+    lastName: lastName.value.trim(),
+    aadhaar: aadhaar.value.replace(/\s/g, "")
+  });
+  log("details", "completed");
+  show("screen-notice");
+});
+
+/* ---------- Screen 2: privacy notice ---------- */
+$$('input[name="age"]').forEach(r => r.addEventListener("change", () => {
+  const yes = r.value === "yes";
+  $("#noticeBtn").disabled = !yes;
+  $("#ageErr").textContent = yes ? "" : "You need to be 18 or older to apply for a SIM.";
+  log("notice", `age_${r.value}`);
+}));
+$("#noticeBtn").addEventListener("click", () => {
+  J.applicant.ageConfirmed = true;
+  setConsent("privacy_notice", "service_processing", "granted");
+  show("screen-marketing");
+});
+
+/* ---------- Screen 3: marketing channels ---------- */
+$("#mktYes").addEventListener("click", () => {
+  const boxes = $$("#channelList input");
+  boxes.forEach(b => setConsent("marketing", b.value, b.checked ? "granted" : "declined"));
+  if (boxes.some(b => b.checked)) show("screen-connect");
+  else submit("marketing_declined");
+});
+$("#mktNo").addEventListener("click", () => {
+  $$("#channelList input").forEach(b => setConsent("marketing", b.value, "declined"));
+  submit("marketing_declined");
+});
+
+/* ---------- Screen 4: connect experiences ---------- */
+$("#connYes").addEventListener("click", () => {
+  setConsent("cross_service", "data_linking", "granted");
+  INTERESTS.forEach(i => setConsent("interest", i, "granted"));
+  submit("completed");
+});
+$("#connNo").addEventListener("click", () => {
+  setConsent("cross_service", "data_linking", "declined");
+  submit("cross_service_declined");
+});
+$("#connChoose").addEventListener("click", () => show("screen-interests"));
+
+/* ---------- Screen 5: choose interests ---------- */
+$("#saveInterests").addEventListener("click", () => {
+  const boxes = $$("#interestList input");
+  const any = boxes.some(b => b.checked);
+  setConsent("cross_service", "data_linking", any ? "granted" : "declined");
+  boxes.forEach(b => setConsent("interest", b.value, b.checked ? "granted" : "declined"));
+  submit(any ? "completed" : "cross_service_declined");
+});
+
+/* ---------- Submit ---------- */
+function buildPayload(outcome) {
+  return {
+    noticeVersion: CONFIG.NOTICE_VERSION,
+    outcome,
+    startedAt: J.startedAt,
+    submittedAt: now(),
+    applicant: { ...J.applicant },
+    consents: J.consents.map(c => ({ ...c })),
+    events: J.events.map(e => ({ ...e })),
+    client: { userAgent: navigator.userAgent }
+  };
+}
+
+async function submit(outcome) {
+  J.outcome = outcome;
+  log("journey", "submitted");
+  lastPayload = buildPayload(outcome);
+  show("screen-done");
+  await send(lastPayload);
+}
+
+async function send(payload) {
+  const box = $("#result");
+  box.innerHTML = '<div class="spinner" role="status" aria-label="Saving"></div><h2>Saving your application</h2>';
+
+  if (!CONFIG.SHEETS_URL) {
+    const ref = "DEMO-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+    const safe = { referenceId: ref, ...payload, applicant: { ...payload.applicant, aadhaar: maskAadhaar(payload.applicant.aadhaar) } };
+    try {
+      const list = JSON.parse(localStorage.getItem("nimbus_demo_submissions") || "[]");
+      list.push(safe);
+      localStorage.setItem("nimbus_demo_submissions", JSON.stringify(list));
+    } catch (e) { /* storage unavailable; the record is still shown below */ }
+    renderSuccess(ref, payload, safe);
+    return;
+  }
+
+  try {
+    // text/plain avoids a CORS preflight, which Apps Script web apps can't answer
+    const res = await fetch(CONFIG.SHEETS_URL.trim(), {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+      redirect: "follow"
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.ok) throw new Error(data.error || `The server returned status ${res.status}.`);
+    renderSuccess(data.referenceId, payload, null);
+  } catch (err) {
+    renderError(err.message === "Failed to fetch"
+      ? "The Google Sheet couldn't be reached. Check that SHEETS_URL ends in /exec and the web app is shared with Anyone, then try again."
+      : err.message);
+  }
+}
+
+function renderSuccess(ref, payload, demoRecord) {
+  const msg = {
+    completed: "Your SIM request is in, and we've saved your consent choices.",
+    marketing_declined: "Your SIM request is in. You won't receive personalised offers or updates.",
+    cross_service_declined: "Your SIM request is in. We won't use your information across other Nimbus Group services."
+  }[payload.outcome];
+
+  const groups = {};
+  payload.consents.forEach(c => (groups[c.purpose] = groups[c.purpose] || []).push(c));
+  const rows = Object.entries(groups).map(([p, list]) =>
+    `<tr><th scope="row">${esc(LABELS[p] || p)}</th><td>${list.map(c =>
+      `<span class="pill ${c.status}">${esc(LABELS[c.item] || c.item)}: ${c.status}</span>`).join("")}</td></tr>`).join("");
+
+  $("#result").innerHTML = `
+    <div class="status-icon"><svg width="26" height="26" viewBox="0 0 14 14" aria-hidden="true"><path d="M2.5 7.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h2 tabindex="-1">Application received</h2>
+    <p>${esc(msg)}</p>
+    <p>Your reference number</p>
+    <div class="ref">${esc(ref || "")}</div>
+    <table class="summary">
+      <tr><th scope="row">Name</th><td>${esc(payload.applicant.firstName)} ${esc(payload.applicant.lastName)}</td></tr>
+      <tr><th scope="row">Mobile</th><td>${esc(maskMobile(payload.applicant.mobile))}</td></tr>
+      <tr><th scope="row">Aadhaar</th><td>${esc(maskAadhaar(payload.applicant.aadhaar))}</td></tr>
+      ${rows}
+    </table>
+    ${demoRecord ? `<p class="demo-note">Demo mode: no Google Sheets URL is set, so this record was saved in this browser only. Set <code>CONFIG.SHEETS_URL</code> in index.html to send records to your sheet.</p>
+      <details><summary>View the record that would be sent</summary><pre>${esc(JSON.stringify(demoRecord, null, 2))}</pre></details>` : ""}
+    <div class="actions" style="justify-content:flex-start;margin-top:20px">
+      <button class="btn btn-ghost" type="button" id="restart">Start a new application</button>
+    </div>`;
+  $("#restart").addEventListener("click", restart);
+  $("#result h2").focus();
+}
+
+function renderError(message) {
+  $("#result").innerHTML = `
+    <div class="status-icon fail"><svg width="22" height="22" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+    <h2 tabindex="-1">Your application wasn't saved</h2>
+    <p>${esc(message)}</p>
+    <div class="actions" style="justify-content:flex-start">
+      <button class="btn btn-primary" type="button" id="retry">Try again</button>
+      <button class="btn btn-ghost" type="button" id="restart">Start over</button>
+    </div>`;
+  $("#retry").addEventListener("click", () => send(lastPayload));
+  $("#restart").addEventListener("click", restart);
+  $("#result h2").focus();
+}
+
+function restart() {
+  resetJourney();
+  $$("input.text").forEach(i => { i.value = ""; i.readOnly = false; fieldError(i, ""); });
+  $$('input[name="age"]').forEach(r => r.checked = false);
+  $("#noticeBtn").disabled = true; $("#ageErr").textContent = "";
+  $$("#channelList input").forEach(b => b.checked = true);
+  $$("#interestList input").forEach(b => b.checked = false);
+  $("#otpBlock").hidden = true; $("#otpBtn").hidden = true;
+  $("#verifyBtn").hidden = false; $("#clearMobile").hidden = false;
+  $("#step1").className = "step open"; $("#step1 .step-num").textContent = "1"; $("#step1Summary").textContent = "";
+  $("#step2").className = "step locked";
+  show("screen-apply");
+}
+
+resetJourney();
+log("apply", "viewed");
+</script>
+</body>
+</html>
