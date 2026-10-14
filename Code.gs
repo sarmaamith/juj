@@ -23,12 +23,70 @@ const TABS = {
     headers: ['Reference ID', 'Step', 'Action', 'Occurred at'],
     textCols: [1]
   },
+  securiti: {
+    name: 'Securiti sync',
+    headers: ['Reference ID', 'Attempted at', 'Result', 'HTTP status', 'Response', 'Request body'],
+    textCols: [1]
+  },
   audit: {
     name: 'Audit',
     headers: ['Changed at', 'Changed by', 'Reference ID', 'Purpose', 'Item', 'Old status', 'New status', 'Consents row'],
     textCols: [3]
   }
 };
+
+/* ---------- Securiti consent upload ----------
+ * Keys are NOT stored here. Add them in Apps Script > Project Settings > Script properties:
+ *   SECURITI_API_KEY, SECURITI_API_SECRET, SECURITI_TIDENT
+ *   SECURITI_COLLECTION_POINT_ID (optional, if your consent_upload API expects one)
+ * Then replace each purpose ID below with the matching purpose ID from your Securiti console.
+ */
+const SECURITI = {
+  url: 'https://app.securiti.ai/privaci/v1/consentapi/consent_upload',
+  purposeMap: {
+    'privacy_notice.service_processing': 'REPLACE_WITH_PURPOSE_ID',
+    'marketing.calls':                   'REPLACE_WITH_PURPOSE_ID',
+    'marketing.whatsapp':                'REPLACE_WITH_PURPOSE_ID',
+    'marketing.sms':                     'REPLACE_WITH_PURPOSE_ID',
+    'marketing.email':                   'REPLACE_WITH_PURPOSE_ID',
+    'cross_service.data_linking':        'REPLACE_WITH_PURPOSE_ID',
+    'interest.shopping_lifestyle':       'REPLACE_WITH_PURPOSE_ID',
+    'interest.entertainment':            'REPLACE_WITH_PURPOSE_ID',
+    'interest.sports_experiences':       'REPLACE_WITH_PURPOSE_ID',
+    'interest.financial_services':       'REPLACE_WITH_PURPOSE_ID',
+    'interest.health_wellness':          'REPLACE_WITH_PURPOSE_ID',
+    'interest.education':                'REPLACE_WITH_PURPOSE_ID'
+  },
+  // Status values your Securiti tenant expects
+  statusMap: { granted: 'GRANTED', declined: 'DECLINED', withdrawn: 'WITHDRAWN' }
+};
+
+/**
+ * Builds the consent_upload request body. Field names here are a starting point:
+ * check them against the consent_upload spec for your Securiti tenant and rename
+ * as needed. This is the only function you should need to change.
+ */
+function buildSecuritiBody_(ref, applicant, consents, noticeVersion) {
+  const cpId = PropertiesService.getScriptProperties().getProperty('SECURITI_COLLECTION_POINT_ID');
+  const body = {
+    data_subject: {
+      email: str_(applicant.email).toLowerCase(),
+      phone: '+91' + applicant.mobile,
+      first_name: str_(applicant.firstName),
+      last_name: str_(applicant.lastName)
+    },
+    reference_id: ref,
+    notice_version: noticeVersion,
+    source: 'nimbus-sim-website',
+    consents: consents.map(c => ({
+      purpose_id: SECURITI.purposeMap[c.purpose + '.' + c.item],
+      status: SECURITI.statusMap[c.status],
+      consented_at: c.capturedAt
+    }))
+  };
+  if (cpId) body.collection_point_id = cpId;
+  return body;
+}
 
 const STATUS_COL = 5;                       // "Status" column in Consents
 const STATUSES = ['granted', 'declined', 'withdrawn'];
@@ -125,13 +183,81 @@ function doPost(e) {
     if (events.length) append_(ensureTab_(ss, TABS.events), events);
 
     SpreadsheetApp.flush();
-    return json_({ ok: true, referenceId: ref });
+    lock.releaseLock();   // don't hold the sheet while waiting on Securiti
+
+    const securiti = syncToSecuriti_(ref, a, p.consents, notice);
+    return json_({ ok: true, referenceId: ref, securiti: securiti.result });
   } catch (err) {
     console.error(err);
     return json_({ ok: false, error: "The application couldn't be saved. Try again in a moment." });
   } finally {
     lock.releaseLock();
   }
+}
+
+/* ---------- Securiti sync ---------- */
+function syncToSecuriti_(ref, applicant, consents, noticeVersion) {
+  const props = PropertiesService.getScriptProperties();
+  const key = props.getProperty('SECURITI_API_KEY');
+  const secret = props.getProperty('SECURITI_API_SECRET');
+  const tident = props.getProperty('SECURITI_TIDENT');
+  if (!key || !secret || !tident) return logSync_(ref, 'not_configured', '', 'Securiti keys are not set in Script properties.', '');
+
+  const unmapped = consents.filter(c => {
+    const id = SECURITI.purposeMap[c.purpose + '.' + c.item];
+    return !id || id.indexOf('REPLACE_') === 0;
+  });
+  if (unmapped.length) {
+    return logSync_(ref, 'not_configured', '', 'Missing Securiti purpose IDs for: ' +
+      unmapped.map(c => c.purpose + '.' + c.item).join(', '), '');
+  }
+
+  const body = JSON.stringify(buildSecuritiBody_(ref, applicant, consents, noticeVersion));
+  return sendToSecuriti_(ref, body);
+}
+
+function sendToSecuriti_(ref, body) {
+  const props = PropertiesService.getScriptProperties();
+  try {
+    const res = UrlFetchApp.fetch(SECURITI.url, {
+      method: 'post',
+      contentType: 'application/json',
+      headers: {
+        'X-API-Key': props.getProperty('SECURITI_API_KEY'),
+        'X-API-Secret': props.getProperty('SECURITI_API_SECRET'),
+        'X-TIDENT': props.getProperty('SECURITI_TIDENT')
+      },
+      payload: body,
+      muteHttpExceptions: true
+    });
+    const code = res.getResponseCode();
+    const ok = code >= 200 && code < 300;
+    return logSync_(ref, ok ? 'sent' : 'failed', code, res.getContentText().slice(0, 1000), body);
+  } catch (err) {
+    return logSync_(ref, 'failed', '', String(err).slice(0, 1000), body);
+  }
+}
+
+function logSync_(ref, result, code, response, body) {
+  try {
+    const sh = ensureTab_(SpreadsheetApp.getActiveSpreadsheet(), TABS.securiti);
+    append_(sh, [[ref, new Date(), result, code, response, body]]);
+  } catch (err) { console.error(err); }
+  return { result: result };
+}
+
+/**
+ * Resends every submission whose latest Securiti attempt failed.
+ * Run it from the editor, or add a time-driven trigger (e.g. hourly).
+ */
+function retryFailedSecuritiSyncs() {
+  const sh = ensureTab_(SpreadsheetApp.getActiveSpreadsheet(), TABS.securiti);
+  const rows = sh.getLastRow() > 1 ? sh.getRange(2, 1, sh.getLastRow() - 1, 6).getValues() : [];
+  const latest = {};
+  rows.forEach(r => { latest[r[0]] = r; });   // last attempt per reference ID
+  Object.values(latest)
+    .filter(r => r[2] === 'failed' && r[5])
+    .forEach(r => sendToSecuriti_(r[0], r[5]));
 }
 
 /* ---------- Audit trail for manual consent edits ---------- */
