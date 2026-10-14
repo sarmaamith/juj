@@ -819,18 +819,16 @@ $("#lookupBtn").addEventListener("click", async () => {
       out.innerHTML = `<p>We couldn't find any applications for ${esc(maskMobile(lookupMobile.value))}. Check the number, or apply for a SIM first.</p>`;
     } else {
       lookedUpMobile = lookupMobile.value;
-      out.innerHTML = `<p>${emails.length === 1 ? "This email is" : `These ${emails.length} emails are`} linked to ${esc(maskMobile(lookupMobile.value))}. Choose one to see its preferences.</p>
+      out.innerHTML = `<p>${emails.length === 1 ? "This email is" : `These ${emails.length} emails are`} linked to ${esc(maskMobile(lookupMobile.value))}. Choose one and we'll email it a link to your preference center.</p>
         <div class="pick-row">
           <div class="field">
             <label for="emailSelect">Email</label>
             <select class="text" id="emailSelect">${emails.map((e, i) => `<option value="${i}">${esc(e)}</option>`).join("")}</select>
           </div>
           <button class="btn btn-primary" id="sendLinkBtn" type="button">Email me a link</button>
-          <button class="btn btn-ghost" id="viewConsentsBtn" type="button">View preferences</button>
         </div>
         <p class="hint">We'll email a secure link to your preference center, where you can change your choices.</p>
         <div id="consentView" class="consent-view" aria-live="polite"></div>`;
-      $("#viewConsentsBtn").addEventListener("click", viewConsents);
       $("#sendLinkBtn").addEventListener("click", sendPreferenceLink);
     }
   } catch (err) {
@@ -866,51 +864,6 @@ async function sendPreferenceLink() {
   } finally {
     btn.disabled = false; btn.textContent = "Email me a link";
   }
-}
-
-async function viewConsents() {
-  const btn = $("#viewConsentsBtn"), view = $("#consentView");
-  const sel = $("#emailSelect");
-  const label = sel.options[sel.selectedIndex].text;
-  if (!CONFIG.SHEETS_URL) {
-    view.innerHTML = `<p class="err">Demo mode: set CONFIG.SHEETS_URL to read preferences from Securiti.</p>`;
-    return;
-  }
-  btn.disabled = true; btn.textContent = "Loading…";
-  view.innerHTML = "";
-  try {
-    const res = await fetch(CONFIG.SHEETS_URL.trim(), {
-      method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "read_consents", mobile: lookedUpMobile, index: Number(sel.value) }),
-      redirect: "follow"
-    }).catch(() => { throw new Error("The Google Sheet couldn't be reached. Try again in a moment."); });
-    const data = await res.json().catch(() => ({}));
-    if (!data.ok) throw new Error(data.error || "Preferences couldn't be loaded. Try again in a moment.");
-    renderConsents(data.email || label, data.consents || []);
-  } catch (err) {
-    view.innerHTML = `<p class="err">${esc(err.message)}</p>`;
-  } finally {
-    btn.disabled = false; btn.textContent = "View preferences";
-  }
-}
-
-function renderConsents(email, consents) {
-  const view = $("#consentView");
-  if (!consents.length) {
-    view.innerHTML = `<p>The preference center has no saved choices for ${esc(email)} yet.</p>`;
-    return;
-  }
-  const groups = {};
-  consents.forEach(c => (groups[c.processing || "Other"] = groups[c.processing || "Other"] || []).push(c));
-  const newest = consents.map(c => c.updatedAt).filter(Boolean).sort().pop();
-  view.innerHTML = `
-    <h3>Preferences for ${esc(email)}</h3>
-    ${newest ? `<p class="hint">Last changed ${esc(new Date(newest).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }))}</p>` : ""}
-    <table class="summary">${Object.entries(groups).map(([p, list]) =>
-      `<tr><th scope="row">${esc(p)}</th><td>${list.map(c =>
-        `<span class="pill ${c.status === "granted" ? "granted" : "declined"}">${esc(c.item || p)}: ${esc(c.status)}</span>`).join("")}</td></tr>`).join("")}
-    </table>`;
 }
 
 async function lookupEmails(mobileNumber) {
