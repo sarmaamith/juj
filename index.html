@@ -448,7 +448,7 @@
    "https://script.google.com/macros/s/AKfycb.../exec"
    Leave it empty to run in demo mode (records are kept in this browser only). */
 const CONFIG = {
-  SHEETS_URL: "https://script.google.com/macros/s/AKfycbzAqmHX_ha2kd08SzRKkwFkBzmrnl5_UVe7P5kjGWQxdsvIWna7fab0Vmxs9yR_VJZr/exec",
+  SHEETS_URL: "",
   NOTICE_VERSION: "2026-10-v1"
 };
 /* ================================================== */
@@ -673,7 +673,7 @@ async function send(payload) {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data.ok) throw new Error(data.error || `The server returned status ${res.status}.`);
-    renderSuccess(data.referenceId, payload, null);
+    renderSuccess(data.referenceId, payload, null, data.securiti);
   } catch (err) {
     renderError(err.message === "Failed to fetch"
       ? "The Google Sheet couldn't be reached. Check that SHEETS_URL ends in /exec and the web app is shared with Anyone, then try again."
@@ -681,7 +681,12 @@ async function send(payload) {
   }
 }
 
-function renderSuccess(ref, payload, demoRecord) {
+function renderSuccess(ref, payload, demoRecord, securiti) {
+  const syncText = {
+    sent: "Consents sent to Securiti.",
+    failed: "Saved to the sheet. The Securiti upload failed and will be retried.",
+    not_configured: "Saved to the sheet. Securiti upload isn't set up yet."
+  }[securiti];
   const msg = {
     completed: "Your SIM request is in, and we've saved your consent choices.",
     marketing_declined: "Your SIM request is in. You won't receive personalised offers or updates.",
@@ -705,6 +710,7 @@ function renderSuccess(ref, payload, demoRecord) {
       <tr><th scope="row">Mobile</th><td>${esc(maskMobile(payload.applicant.mobile))}</td></tr>
       <tr><th scope="row">Aadhaar</th><td>${esc(maskAadhaar(payload.applicant.aadhaar))}</td></tr>
       ${rows}
+      ${syncText ? `<tr><th scope="row">Securiti</th><td>${esc(syncText)}</td></tr>` : ""}
     </table>
     ${demoRecord ? `<p class="demo-note">Demo mode: no Google Sheets URL is set, so this record was saved in this browser only. Set <code>CONFIG.SHEETS_URL</code> in index.html to send records to your sheet.</p>
       <details><summary>View the record that would be sent</summary><pre>${esc(JSON.stringify(demoRecord, null, 2))}</pre></details>` : ""}
