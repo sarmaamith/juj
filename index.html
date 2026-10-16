@@ -49,7 +49,7 @@
   .navlinks{display:flex;list-style:none;margin:0;padding:0;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1 1 auto}
   .nav-cta{margin-left:12px}
   .navlinks::-webkit-scrollbar{display:none}
-  .navlinks a{display:block;padding:18px 10px 15px;font-size:.95rem;color:var(--ink);text-decoration:none;font-weight:500;white-space:nowrap;border-bottom:3px solid transparent}
+  .navlinks a{display:block;padding:18px 8px 15px;font-size:.92rem;color:var(--ink);text-decoration:none;font-weight:500;white-space:nowrap;border-bottom:3px solid transparent}
   .navlinks a:hover{color:var(--brand)}
   .navlinks a[aria-current="page"]{border-color:var(--brand);font-weight:700}
 
@@ -127,6 +127,12 @@
     .navbar .nav-cta.portal svg{width:16px;height:16px}
   }
   #consentPortal aside{position:static;top:auto}
+  .nav-cta[aria-pressed="true"]{background:var(--brand);color:var(--brand-ink)}
+  /* When the menu doesn't fit beside the logo and button, put it on its own row */
+  .navbar.wrapped{flex-wrap:wrap;row-gap:0}
+  .navbar.wrapped .brand{margin-right:auto}
+  .navbar.wrapped .navlinks{order:3;flex:1 1 100%;margin:0 calc(-1 * clamp(16px,4vw,40px));padding:0 clamp(16px,4vw,40px)}
+  .navbar.wrapped .navlinks a{padding:10px 10px 11px}
   .nav-cta.portal{margin-left:8px;display:flex;align-items:center;gap:6px;background:var(--brand);color:var(--brand-ink)}
   .nav-cta.portal:hover{filter:brightness(1.1)}
   @media (max-width:760px){.nav-cta .lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.nav-cta.portal{padding:8px}}
@@ -307,9 +313,10 @@
     <li><a href="#">Apps</a></li>
     <li><a href="#">Recharge</a></li>
     <li><a href="#" id="navSim" aria-current="page">Get a SIM</a></li>
-    <li><a href="#" id="navPrefs">Manage Preferences</a></li>
+    <li id="navPrefsItem" hidden><a href="#" id="navPrefs">Your current preferences</a></li>
     <li><a href="#">Pay bills</a></li>
   </ul>
+  <button class="nav-cta" id="managePrefsBtn" type="button">Manage preferences</button>
 </nav>
 
 <main>
@@ -412,7 +419,7 @@
               <div class="err"></div>
             </div>
             <div class="actions">
-              <button class="btn btn-ghost" id="lookupBack" type="button">Back to Get a SIM</button>
+              <button class="btn btn-ghost" id="lookupBack" type="button">Back</button>
               <button class="btn btn-primary" id="lookupBtn" type="button">Find email</button>
             </div>
             <div id="lookupResult" class="lookup-msg" aria-live="polite"></div>
@@ -702,7 +709,7 @@ function setConsent(purpose, item, status) {
 }
 function show(id) {
   closePortal();
-  setNav(id === "screen-manage" ? "prefs" : "sim");
+  setNav(id === "screen-manage" ? "manage" : "sim");
   if (id !== "screen-manage") lastJourneyScreen = id;
   $$(".screen").forEach(s => s.classList.toggle("active", s.id === id));
   window.scrollTo({ top: 0 });
@@ -982,13 +989,19 @@ function restart() {
 /* ---------- Manage preferences: email lookup ---------- */
 const lookupMobile = $("#lookupMobile");
 digitsOnly(lookupMobile, 10);
+let manageReturnTo = null;
 function openManage() {
+  const portalOpen = !document.getElementById("consentPortal").hidden;
+  manageReturnTo = portalOpen ? "portal" : lastJourneyScreen;
   lookupMobile.value = ""; fieldError(lookupMobile, "");
   $("#lookupResult").innerHTML = "";
   show("screen-manage");
   lookupMobile.focus();
 }
-$("#lookupBack").addEventListener("click", () => show(lastJourneyScreen));
+$("#lookupBack").addEventListener("click", () => {
+  if (manageReturnTo === "portal" && returningSession) openPortal(); else show(lastJourneyScreen);
+});
+$("#managePrefsBtn").addEventListener("click", () => openManage());
 lookupMobile.addEventListener("keydown", e => { if (e.key === "Enter") $("#lookupBtn").click(); });
 
 $("#lookupBtn").addEventListener("click", async () => {
@@ -1123,6 +1136,7 @@ function setNav(which) {
   $("#navPrefs").toggleAttribute("aria-current", which === "prefs");
   if (which === "sim") $("#navSim").setAttribute("aria-current", "page");
   if (which === "prefs") $("#navPrefs").setAttribute("aria-current", "page");
+  $("#managePrefsBtn").setAttribute("aria-pressed", String(which === "manage"));
   revealNavItem();
 }
 // On narrow screens the menu scrolls sideways; keep the highlighted item (and its neighbour) in view
@@ -1132,8 +1146,15 @@ function revealNavItem() {
   const target = item.offsetLeft - list.clientWidth / 2 + item.offsetWidth / 2;
   list.scrollLeft = Math.max(0, target);
 }
-window.addEventListener("load", revealNavItem);
-window.addEventListener("resize", revealNavItem);
+function fitNav() {
+  const bar = $(".navbar"), list = $(".navlinks");
+  if (!bar || !list) return;
+  bar.classList.remove("wrapped");
+  if (window.innerWidth > 760 && list.scrollWidth > list.clientWidth + 1) bar.classList.add("wrapped");
+  revealNavItem();
+}
+window.addEventListener("load", fitNav);
+window.addEventListener("resize", fitNav);
 function closePortal() {
   const portal = document.getElementById("consentPortal");
   if (!portal || portal.hidden) return;
@@ -1149,7 +1170,7 @@ function openPortal() {
 }
 $("#navPrefs").addEventListener("click", e => {
   e.preventDefault();
-  if (returningSession) openPortal(); else openManage();
+  if (returningSession) openPortal();
 });
 $("#navSim").addEventListener("click", e => {
   e.preventDefault();
@@ -1200,6 +1221,7 @@ function setPortalPerson(p) {
 }
 function openReturning(info) {
   returningSession = info;
+  $("#navPrefsItem").hidden = false; fitNav();
   const m = J.applicant.mobile;
   const name = [info.firstName, info.lastName].filter(Boolean).join(" ") || "ACME Mobile customer";
   const since = info.memberSince ? new Date(info.memberSince) : null;
@@ -1223,6 +1245,7 @@ function openReturning(info) {
 }
 function signOut() {
   returningSession = null;
+  $("#navPrefsItem").hidden = true; fitNav();
   setPortalPerson(PORTAL_DEFAULTS);
   $("#pvSignOut").hidden = true;
   restart();
