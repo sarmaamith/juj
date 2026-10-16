@@ -131,37 +131,8 @@
   .nav-cta.portal:hover{filter:brightness(1.1)}
   @media (max-width:760px){.nav-cta .lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.nav-cta.portal{padding:8px}}
 
-  /* ===== Returning customer: account page ===== */
-  .acct-hello{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
-  .acct-hello h1{margin:0 0 4px}
-  .acct-hello p{margin:0;color:var(--muted)}
-  .acct{display:grid;grid-template-columns:minmax(258px,.85fr) minmax(0,1.3fr);gap:18px;align-items:start}
-  @media (max-width:640px){.acct{grid-template-columns:1fr}}
-  .acct-label{font-size:1rem;margin:0 0 10px}
-  .acct-card{position:relative;display:flex;align-items:center;gap:10px;background:var(--brand-soft);border:2px solid var(--brand);border-radius:16px;padding:14px 40px 14px 12px}
-  .acct-card .sim{color:var(--brand);flex:none}
-  .acct-card b{display:block;font-size:1rem;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .acct-card span,.acct-card small{display:block;color:var(--muted);font-size:.86rem}
-  .acct-card .dot{position:absolute;top:12px;right:12px;width:20px;height:20px;border-radius:50%;border:6px solid var(--brand);background:var(--card)}
-  .acct-card .sim{width:24px;height:24px}
-  .acct-family{text-align:center;border-top:1px solid var(--line);margin-top:18px;padding-top:18px}
-  .acct-family svg{color:var(--muted)}
-  .acct-family b{display:block;margin:6px 0 4px}
-  .acct-family p{color:var(--muted);font-size:.9rem}
-  .acct-box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px}
-  .acct-box .k{display:block;font-weight:700;margin-bottom:4px}
-  .acct-box .big{font-size:1.9rem;font-weight:800;line-height:1.1}
-  .acct-box .big span{font-size:1rem;font-weight:700;color:var(--muted)}
-  .acct-box p{margin:6px 0 12px}
-  .acct-profile{display:flex;align-items:flex-start;gap:12px}
-  .acct-profile b{display:block;font-size:1.15rem}
-  .acct-profile strong{display:block;font-size:1.1rem;margin-top:8px;font-variant-numeric:tabular-nums}
-  .acct-profile small{display:block;color:var(--muted);font-size:.85rem}
-  .gear{margin-left:auto;width:40px;height:40px;border-radius:50%;border:0;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;cursor:pointer;flex:none}
-  .acct-note{font-size:.82rem;color:var(--muted);text-align:center;margin:-6px 0 14px}
-  .okline{display:flex;align-items:center;gap:8px;color:var(--ok);font-weight:700;font-size:.92rem}
-  .acct-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .acct-btns .btn{padding:11px 10px;font-size:.92rem}
+  #consentPortal .pv-signout{margin-top:12px;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.65);color:#fff;border-radius:999px;padding:7px 16px;font-weight:700;cursor:pointer}
+  #consentPortal .pv-signout:hover{background:rgba(255,255,255,.24)}
   /* ===== Future Consent Portal (self-contained) ===== */
   #consentPortal{--pv-bar:#1E2A8A;--pv-brand:var(--brand);--pv-brand-ink:var(--brand-ink);--pv-soft:var(--brand-soft);--pv-bg:var(--bg);--pv-card:var(--card);--pv-line:var(--line);--pv-ink:var(--ink);--pv-muted:var(--muted);--pv-ok:var(--ok);--pv-danger:var(--danger);--pv-accent:#FFC23D;container-type:inline-size;position:relative;background:var(--pv-bg);color:var(--pv-ink);padding:0 clamp(14px,3vw,40px) 48px}
   #consentPortal *,#consentPortal *::before,#consentPortal *::after{box-sizing:border-box}
@@ -335,11 +306,10 @@
     <li><a href="#">Devices</a></li>
     <li><a href="#">Apps</a></li>
     <li><a href="#">Recharge</a></li>
-    <li><a href="#" aria-current="page">Get a SIM</a></li>
+    <li><a href="#" id="navSim" aria-current="page">Get a SIM</a></li>
+    <li><a href="#" id="navPrefs">Manage Preferences</a></li>
     <li><a href="#">Pay bills</a></li>
   </ul>
-  <button class="nav-cta" id="managePrefsBtn" type="button">Manage preferences</button>
-  <button class="nav-cta portal" id="portalBtn" type="button" title="Future Consent Portal"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2 3 5v5c0 4 3 7 7 8 4-1 7-4 7-8V5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m7 10 2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lbl">Future Consent Portal</span></button>
 </nav>
 
 <main>
@@ -442,7 +412,7 @@
               <div class="err"></div>
             </div>
             <div class="actions">
-              <button class="btn btn-ghost" id="lookupBack" type="button">Back to SIM application</button>
+              <button class="btn btn-ghost" id="lookupBack" type="button">Back to Get a SIM</button>
               <button class="btn btn-primary" id="lookupBtn" type="button">Find email</button>
             </div>
             <div id="lookupResult" class="lookup-msg" aria-live="polite"></div>
@@ -571,61 +541,6 @@
       </div>
     </div>
 
-    <!-- Returning customer: account page (consent already given) -->
-    <div class="screen" id="screen-account">
-      <div class="acct-hello">
-        <div>
-          <h1 id="acctHello">Welcome back</h1>
-          <p id="acctSince">Your consent choices are already saved, so there's nothing more to fill in.</p>
-        </div>
-        <button class="btn btn-ghost" id="acctSignOut" type="button" style="padding:9px 18px">Sign out</button>
-      </div>
-      <div class="acct">
-        <div>
-          <h2 class="acct-label">Primary contact</h2>
-          <div class="acct-card" aria-current="true">
-            <svg class="sim" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M8 3h10l6 6v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><rect x="10" y="13" width="10" height="9" rx="1.5" fill="currentColor"/></svg>
-            <div><b id="acctNumber"></b><span id="acctName"></span><small>Prepaid · ACME Mobile</small></div>
-            <span class="dot" aria-hidden="true"></span>
-          </div>
-          <div class="acct-family">
-            <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="11" cy="10" r="4" fill="currentColor"/><circle cx="21" cy="11" r="3.2" fill="currentColor"/><path d="M3 24c.8-4.6 4-7 8-7s7.2 2.4 8 7ZM18 17.5c4.2-.6 8.2 1.4 9 6.5h-6" fill="currentColor"/></svg>
-            <b>Bring your family along</b>
-            <p>Add the numbers of people you look after to recharge, pay bills and track their data in one place.</p>
-            <button class="btn btn-ghost" type="button">Add a number</button>
-          </div>
-        </div>
-        <div>
-          <article class="acct-box acct-profile">
-            <div>
-              <b id="acctName2"></b>
-              <small>Prepaid · ACME Mobile</small>
-              <strong id="acctNumber2"></strong>
-              <small>Your primary contact number</small>
-            </div>
-            <button class="gear" id="acctSettings" type="button" title="Privacy and consent settings" aria-label="Privacy and consent settings"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M8.6 2h2.8l.4 2.2 1.6.9 2.1-.8 1.4 2.4-1.7 1.5v1.6l1.7 1.5-1.4 2.4-2.1-.8-1.6.9-.4 2.2H8.6l-.4-2.2-1.6-.9-2.1.8-1.4-2.4 1.7-1.5V8.2L3.1 6.7l1.4-2.4 2.1.8 1.6-.9Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="10" cy="10" r="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
-          </article>
-          <article class="acct-box">
-            <span class="k">Data</span>
-            <div class="big">2 GB<span> / day</span></div>
-            <p>Unlimited 5G where available</p>
-            <button class="btn btn-ghost" type="button" style="width:100%">See usage</button>
-          </article>
-          <p class="acct-note">Usage can take up to an hour to show here.</p>
-          <article class="acct-box">
-            <span class="k">Current plan</span>
-            <div class="big">₹349</div>
-            <p>Renews on <b id="acctRenew"></b> · <button class="link-btn" type="button">Plan details</button></p>
-            <p class="okline"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="currentColor"/><path d="m6 10 3 3 5-6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Your last recharge of ₹349 went through</p>
-            <div class="acct-btns">
-              <button class="btn btn-ghost" type="button">Recharge history</button>
-              <button class="btn btn-primary" type="button">Recharge early</button>
-            </div>
-          </article>
-        </div>
-      </div>
-    </div>
-
     <!-- Screen 6: result -->
     <div class="screen" id="screen-done">
       <div class="receipt" id="result"></div>
@@ -663,9 +578,10 @@
     <div class="pv-head">
       <button class="pv-back" type="button" aria-label="Back"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M14 4 7 11l7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div>
-        <div class="pv-kicker">Privacy hub</div>
-        <h1>Your data, your say</h1>
-        <p>Choose how ACME Mobile keeps in touch and how your information may be used. Nothing changes until you save.</p>
+        <div class="pv-kicker" id="pvKicker">Privacy hub</div>
+        <h1 id="pvTitle">Your data, your say</h1>
+        <p id="pvIntro">Choose how ACME Mobile keeps in touch and how your information may be used. Nothing changes until you save.</p>
+        <button class="pv-signout" id="pvSignOut" type="button" hidden>Sign out</button>
       </div>
     </div>
     <div class="pv-grid">
@@ -786,6 +702,8 @@ function setConsent(purpose, item, status) {
 }
 function show(id) {
   closePortal();
+  setNav(id === "screen-manage" ? "prefs" : "sim");
+  if (id !== "screen-manage") lastJourneyScreen = id;
   $$(".screen").forEach(s => s.classList.toggle("active", s.id === id));
   window.scrollTo({ top: 0 });
   const h = $(`#${id} h1, #${id} h2`);
@@ -853,7 +771,7 @@ $("#otpBtn").addEventListener("click", async () => {
   let found = null;
   try { found = await checkReturning(J.applicant.mobile); } catch (e) { found = null; }
   btn.disabled = false; btn.textContent = "Confirm code";
-  if (found && found.returning) { openAccount(found); return; }
+  if (found && found.returning) { openReturning(found); return; }
 
   $("#step1").classList.remove("open"); $("#step1").classList.add("done");
   $("#step1Summary").textContent = `Verified ${maskMobile(J.applicant.mobile)}`;
@@ -1064,17 +982,13 @@ function restart() {
 /* ---------- Manage preferences: email lookup ---------- */
 const lookupMobile = $("#lookupMobile");
 digitsOnly(lookupMobile, 10);
-let screenBeforeManage = "screen-apply";
-
-$("#managePrefsBtn").addEventListener("click", () => {
-  const current = $(".screen.active");
-  if (current && current.id !== "screen-manage") screenBeforeManage = current.id;
+function openManage() {
   lookupMobile.value = ""; fieldError(lookupMobile, "");
   $("#lookupResult").innerHTML = "";
   show("screen-manage");
   lookupMobile.focus();
-});
-$("#lookupBack").addEventListener("click", () => show(screenBeforeManage));
+}
+$("#lookupBack").addEventListener("click", () => show(lastJourneyScreen));
 lookupMobile.addEventListener("keydown", e => { if (e.key === "Enter") $("#lookupBtn").click(); });
 
 $("#lookupBtn").addEventListener("click", async () => {
@@ -1201,21 +1115,52 @@ log("apply", "viewed");
   q(".pv-back").addEventListener("click", () => { if (window.ConsentPortal.onBack) window.ConsentPortal.onBack(); });
 })();
 
+/* ---------- Top menu: Get a SIM / Manage Preferences ---------- */
+let lastJourneyScreen = "screen-apply";
+let returningSession = null;   // set when a returning customer signs in
+function setNav(which) {
+  $("#navSim").toggleAttribute("aria-current", which === "sim");
+  $("#navPrefs").toggleAttribute("aria-current", which === "prefs");
+  if (which === "sim") $("#navSim").setAttribute("aria-current", "page");
+  if (which === "prefs") $("#navPrefs").setAttribute("aria-current", "page");
+  revealNavItem();
+}
+// On narrow screens the menu scrolls sideways; keep the highlighted item (and its neighbour) in view
+function revealNavItem() {
+  const list = $(".navlinks"), item = $('.navlinks a[aria-current="page"]');
+  if (!list || !item || list.scrollWidth <= list.clientWidth) return;
+  const target = item.offsetLeft - list.clientWidth / 2 + item.offsetWidth / 2;
+  list.scrollLeft = Math.max(0, target);
+}
+window.addEventListener("load", revealNavItem);
+window.addEventListener("resize", revealNavItem);
 function closePortal() {
   const portal = document.getElementById("consentPortal");
   if (!portal || portal.hidden) return;
   portal.hidden = true; document.querySelector("main").hidden = false;
-  document.getElementById("portalBtn").hidden = false;
 }
-document.getElementById("portalBtn").addEventListener("click", () => {
+function openPortal() {
   ConsentPortal.prepare();
   document.querySelector("main").hidden = true;
   document.getElementById("consentPortal").hidden = false;
-  document.getElementById("portalBtn").hidden = true;
+  setNav("prefs");
   window.scrollTo({ top: 0 });
   ConsentPortal.focus();
+}
+$("#navPrefs").addEventListener("click", e => {
+  e.preventDefault();
+  if (returningSession) openPortal(); else openManage();
 });
-ConsentPortal.onBack = () => { closePortal(); window.scrollTo({ top: 0 }); };
+$("#navSim").addEventListener("click", e => {
+  e.preventDefault();
+  if (returningSession) { signOut(); return; }
+  show(lastJourneyScreen);
+});
+ConsentPortal.onBack = () => {
+  if (returningSession) { signOut(); return; }
+  closePortal(); show(lastJourneyScreen);
+};
+$("#pvSignOut").addEventListener("click", () => signOut());
 
 /* ---------- Returning customers ---------- */
 // Looks for an earlier completed sign-up with this mobile number.
@@ -1226,7 +1171,9 @@ async function checkReturning(mobileNumber) {
     try { list = JSON.parse(localStorage.getItem("nimbus_demo_submissions") || "[]"); } catch (e) {}
     const mine = list.filter(r => r.applicant && r.applicant.mobile === mobileNumber);
     const last = mine[mine.length - 1];
+    const em = String(last && last.applicant.email || ""), at = em.indexOf("@");
     return last ? { returning: true, firstName: last.applicant.firstName, lastName: last.applicant.lastName,
+                    email: at > 0 ? em.charAt(0) + "***" + em.slice(at) : "",
                     referenceId: last.referenceId, memberSince: last.submittedAt, noticeVersion: last.noticeVersion }
                 : { returning: false };
   }
@@ -1239,30 +1186,47 @@ async function checkReturning(mobileNumber) {
   return data;
 }
 
-function openAccount(info) {
-  const m = J.applicant.mobile;
-  const pretty = `+91 ${m.slice(0, 5)} ${m.slice(5)}`;
-  const name = [info.firstName, info.lastName].filter(Boolean).join(" ") || "ACME Mobile customer";
-  $("#acctHello").textContent = `Welcome back${info.firstName ? ", " + info.firstName : ""}`;
-  const since = info.memberSince ? new Date(info.memberSince) : null;
-  $("#acctSince").textContent = since && !isNaN(since)
-    ? `You gave your consent choices on ${since.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}, so there's nothing more to fill in.`
-    : "Your consent choices are already saved, so there's nothing more to fill in.";
-  $("#acctNumber").textContent = pretty;
-  $("#acctNumber2").textContent = pretty;
-  $("#acctName").textContent = name;
-  $("#acctName2").textContent = name;
-  // Plan renews on the same day each month as the original sign-up
-  const day = since && !isNaN(since) ? since.getDate() : 21;
-  const now = new Date();
-  let renew = new Date(now.getFullYear(), now.getMonth(), day);
-  if (renew <= now) renew = new Date(now.getFullYear(), now.getMonth() + 1, day);
-  $("#acctRenew").textContent = renew.toLocaleDateString("en-IN", { day: "numeric", month: "long" });
-  log("account", "returning_login");
-  show("screen-account");
+const PORTAL_DEFAULTS = {
+  kicker: $("#pvKicker").textContent, title: $("#pvTitle").textContent, intro: $("#pvIntro").textContent,
+  name: $("#consentPortal .pv-who b").textContent, role: $("#consentPortal .pv-who small").textContent,
+  ini: $("#consentPortal .pv-ini").textContent,
+  boxes: $$("#consentPortal .pv-dbox").map(d => [d.querySelector("small").textContent, d.querySelector("span").textContent])
+};
+function setPortalPerson(p) {
+  $("#pvKicker").textContent = p.kicker; $("#pvTitle").textContent = p.title; $("#pvIntro").textContent = p.intro;
+  $("#consentPortal .pv-who b").textContent = p.name; $("#consentPortal .pv-who small").textContent = p.role;
+  $("#consentPortal .pv-ini").textContent = p.ini;
+  $$("#consentPortal .pv-dbox").forEach((d, i) => { d.querySelector("small").textContent = p.boxes[i][0]; d.querySelector("span").textContent = p.boxes[i][1]; });
 }
-$("#acctSignOut").addEventListener("click", () => restart());
-$("#acctSettings").addEventListener("click", () => $("#portalBtn").click());
+function openReturning(info) {
+  returningSession = info;
+  const m = J.applicant.mobile;
+  const name = [info.firstName, info.lastName].filter(Boolean).join(" ") || "ACME Mobile customer";
+  const since = info.memberSince ? new Date(info.memberSince) : null;
+  const sinceText = since && !isNaN(since) ? since.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) : "";
+  const boxes = PORTAL_DEFAULTS.boxes.map(b => b.slice());
+  boxes[1] = ["Primary contact", `+91 ${m.slice(0, 5)} ${m.slice(5)}`];
+  if (info.email) boxes[2] = ["Email address", info.email];
+  setPortalPerson({
+    kicker: "Your data, your say",
+    title: `Welcome back${info.firstName ? ", " + info.firstName : ""}`,
+    intro: sinceText
+      ? `You gave your consent choices on ${sinceText}, so there's nothing more to fill in. Review or change them below.`
+      : "Your consent choices are already saved, so there's nothing more to fill in. Review or change them below.",
+    name, role: "Primary account holder",
+    ini: (info.firstName || "A").charAt(0).toUpperCase() + (info.lastName || "").charAt(0).toUpperCase(),
+    boxes
+  });
+  $("#pvSignOut").hidden = false;
+  log("account", "returning_login");
+  openPortal();
+}
+function signOut() {
+  returningSession = null;
+  setPortalPerson(PORTAL_DEFAULTS);
+  $("#pvSignOut").hidden = true;
+  restart();
+}
 </script>
 </body>
 </html>
